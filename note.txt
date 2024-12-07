@@ -1,0 +1,53 @@
+
+    Its type is “int (*)(char,float)” if an ordinary function
+    Its type is “int (Fred::*)(char,float)” if a non-static member function of class Fred
+
+for initializing or adding to my user defined map there is no = overloaded thus insert() 
+    does not work too. maybe emplace() works.
+    because it is an ordered map,, so i change it to unordered map.--> it wasn't the problem.
+    so i got implicit instantiation of undefined template.
+    EMPLACE() JUST WORKED!!! AND I AM FIGURETIVELY CRYING :))))
+
+fucccccckkk for static members you have to define them,, allocating some memory or you obviously 
+    can not use or modify it.
+
+it's a nasty try to have a static functions in a class accessing a static map member , to call another
+    static function member with arguments :////
+    implicit instantiations and calling a static function without appropriate pointer or sth ...
+    what a messs !!!
+
+    well using iterators and a bunch of correctoins problem solved.
+    
+class c = u. this is copy constructor like : class c(u).
+	but class c; c = u; shallow copy and the double deleting problem. 
+	the solution is overloading = operator.
+
+int & a, b;    // b is not a ref
+int const * a; // pointer to const int
+int * const a; // const pointer to int
+
+neither the & nor the * is distributive over a list of variables. // int& a, b;
+
+$$ I ran to a nasty problem. i have two classes using eachother. i can not included header files
+	recursively... and by using forward declaration i will get accessing to member of an 
+	incomplete type (wich makes sense).
+	1) I can use a namespace instead of a class with static functions.
+	2) I can use an abstract class with virtual methods.-->> actually that was the whole
+		point. :// 
+    3) I can use an interface class accessing to both classes.--> I did so, cause I didn't 
+       want to overload functions. besides two classes weren't the same type to be children
+       of the same parent. it just didn't make sense.    
+		
+relocation against `_ZN12processInput17command_functionsB5cxx11E' in read-only section:
+	1) it's a kind of linking error. if library A is dependant to  library B and A is linked
+	sooner,, this error happens.
+	2) orrrrr if you have declared something or some function in a class, pointing to that 
+	some where else,, but actually you had not define it any where. 
+    3) or you are modifying somthing wich is const or static.		
+	    
+:))))) i have wrote a lambda expression without putting () after defining it. 
+
+****ich habe eine super intresstant nachricht: if you have static members (not member functions),
+    you have to define it in .cpp file too. or you will get undefined reference error.
+getInput.hpp getInput.cpp global.hpp interface.hpp interface.cpp leitner.hpp leitner.cpp main.cpp processInput.hpp processInput.cpp makefile LeitnerBox note.txt
+    
