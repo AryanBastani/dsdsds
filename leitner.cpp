@@ -20,10 +20,10 @@ leitner::leitner()
     boxes_to_review_today[EVERY_DAY_BOX] = box;
 
     boxes_map = {
-        {MONTHLY_BOX, monthly_box},
-        {WEEKLY_BOX, weekly_box},
-        {THREE_DAY_BOX, every_three_day_box},
-        {EVERY_DAY_BOX, every_day_box}
+        {MONTHLY_BOX, &monthly_box},
+        {WEEKLY_BOX, &weekly_box},
+        {THREE_DAY_BOX, &every_three_day_box},
+        {EVERY_DAY_BOX, &every_day_box}
     };
 }
 

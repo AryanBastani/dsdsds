@@ -33,8 +33,8 @@ namespace output {
 
     const std::string_view REVIEW_TODAY_FIRST_LINE = "Flashcard: ";
     const std::string_view REVIEW_TODAY_SECOND_LINE = "\nYour answer: ";
-    const std::string_view REVIEW_TODAY_CORRECT = "Your answer was correct! Well done, keep it up!\n";
-    const std::string_view REVIEW_TODAY_WRONG_FIRST = "Your answer was incorrect. Don't worry! The correct answer is: ";
+    const std::string_view REVIEW_TODAY_CORRECT = "\nYour answer was correct! Well done, keep it up!\n";
+    const std::string_view REVIEW_TODAY_WRONG_FIRST = "\nYour answer was incorrect. Don't worry! The correct answer is: ";
     const std::string_view REVIEW_TODAY_WRONG_SECOND = ". Keep practicing!\n";
     const std::string_view REVIEW_TODAY_LAST_MESSAGE = "You’ve completed today’s review! Keep the momentum going and continue building your knowledge, one flashcard at a time!\n";
 
@@ -48,7 +48,7 @@ namespace output {
     const std::string_view GET_PRG_RPT_THIRD_LINE = "Total Days Participated: ";
     const std::string_view GET_PRG_RPT_FORTH_LINE = "Mastered Flashcards: ";
     const std::string_view GET_PRG_RPT_FIFTH_LINE = "\n";
-    const std::string_view GET_PRG_RPT_SIXTH_LINE = "Keep  up  the  great  work!  You're  making  steady  progress  toward mastering your flashcards.\n";
+    const std::string_view GET_PRG_RPT_SIXTH_LINE = "Keep up the great work! You're making steady progress toward mastering your flashcards.\n";
 
     const std::string_view NEXT_DAY_FIRST_LINE1 = "Good morning! Today is day ";
     const std::string_view NEXT_DAY_FIRST_LINE2 = " of our journey.\n";
@@ -70,7 +70,7 @@ struct day_activity {
     int correct_num;
     int wrong_num;
     bool reviewed;
-    bool participated;
+    int participated;
 };
 
 #endif

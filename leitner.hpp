@@ -14,7 +14,7 @@ class leitner
         int today;
         std::map<int, box_review_today> boxes_to_review_today;
         std::map <int, day_activity> every_day_activity;
-        std::map <int, std::vector<flashcard*>> boxes_map;
+        std::map <int, std::vector<flashcard*>*> boxes_map;
         int streak;
         int total_day_participated;
         int mastered_cards_num;

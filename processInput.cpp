@@ -5,21 +5,50 @@ void defineIterator (int &current_box, std::vector<flashcard*>::iterator &card_i
     switch (current_box)
     {
         case MONTHLY_BOX:
-            card_it = leitner_box->monthly_box.begin();
+            if(leitner_box->monthly_box.size()!=0)
+            {
+                card_it = leitner_box->monthly_box.begin();
+            }
+            else
+            {
+                card_it = leitner_box->monthly_box.end();
+                determineIterator(current_box, card_it, leitner_box);
+            }    
             break;
-        case WEEKLY_BOX: 
-            card_it = leitner_box->weekly_box.begin();
+        case WEEKLY_BOX:
+            if(leitner_box->weekly_box.size()!=0)
+            {
+                card_it = leitner_box->weekly_box.begin();
+            }    
+            else
+            {
+                card_it = leitner_box->weekly_box.end();
+                determineIterator(current_box, card_it, leitner_box);
+            }  
             break;
         case THREE_DAY_BOX:
-            card_it = leitner_box->every_three_day_box.begin();
+            if(leitner_box->every_three_day_box.size()!=0)
+            {
+                card_it = leitner_box->every_three_day_box.begin();
+            }
+            else
+            {
+                card_it = leitner_box->every_three_day_box.end();
+                determineIterator(current_box, card_it, leitner_box);
+            } 
             break; 
         case EVERY_DAY_BOX:
-            card_it = leitner_box->every_day_box.begin();
+            if(leitner_box->every_day_box.size()!=0)
+            {
+                // std::cout << "in define every day box" << std::endl;
+                card_it = leitner_box->every_day_box.begin();
+            }
+            else
+                card_it = leitner_box->every_day_box.end();
             break;
         default:
             break;              
     }
-    leitner_box->every_day_activity[leitner_box->today].reviewed = true;
 }
 
 void determineIterator (int &current_box, std::vector<flashcard*>::iterator &card_it, leitner* leitner_box)
@@ -28,44 +57,50 @@ void determineIterator (int &current_box, std::vector<flashcard*>::iterator &car
     switch (current_box)
     {
     case NOT_INITIALIZED:
+        // std::cout << "in determine in not initialized" << std::endl;
         box_it = find_if(leitner_box->boxes_to_review_today.begin(), leitner_box->boxes_to_review_today.end(),
             [](std::pair<int, box_review_today> box){return box.second.must_review;});
         current_box = box_it->first; 
+        defineIterator (current_box, card_it, leitner_box);    
         break;
     case MONTHLY_BOX:
         if (card_it == leitner_box->monthly_box.end())
         {
             box_it = find_if(leitner_box->boxes_to_review_today.begin(), leitner_box->boxes_to_review_today.end(), 
-            [](std::pair<int, box_review_today> box){if(box.first>MONTHLY_BOX) return box.second.must_review; return false;});
+            [](std::pair<int, box_review_today> box){if(box.first>MONTHLY_BOX) return box.second.must_review;return false;});
             current_box = box_it->first;
+            defineIterator (current_box, card_it, leitner_box);    
         }
         break;
     case WEEKLY_BOX:
         if (card_it == leitner_box->weekly_box.end())
         {
             box_it = find_if(leitner_box->boxes_to_review_today.begin(), leitner_box->boxes_to_review_today.end(), 
-            [](std::pair<int, box_review_today> box){if(box.first>WEEKLY_BOX) return box.second.must_review; return false;});    
+            [](std::pair<int, box_review_today> box){if(box.first>WEEKLY_BOX) return box.second.must_review;return false;});    
             current_box = box_it->first;
+            defineIterator (current_box, card_it, leitner_box);    
         }
         break; 
     case THREE_DAY_BOX:
         if (card_it == leitner_box->every_three_day_box.end())
         {
             box_it = find_if(leitner_box->boxes_to_review_today.begin(), leitner_box->boxes_to_review_today.end(), 
-            [](std::pair<int, box_review_today> box){if(box.first>THREE_DAY_BOX) return box.second.must_review; return false;});    
+            [](std::pair<int, box_review_today> box){if(box.first>THREE_DAY_BOX) return box.second.must_review;return false;});    
             current_box = box_it->first;
+            defineIterator (current_box, card_it, leitner_box);    
         }
         break;    
     default:
         break;
     }
-    defineIterator (current_box, card_it, leitner_box);
 }
 
 void moveCards (int &current_box, std::vector<flashcard*>::iterator &card_it, leitner* leitner_box)
 {
+    // std::cout << "in move cards" << std::endl;
     if ((*card_it)->wrong_count == 0)
     {
+        // std::cout << "erong cpount = 0" << std::endl;
         switch (current_box)
         {
             case MONTHLY_BOX:
@@ -90,6 +125,7 @@ void moveCards (int &current_box, std::vector<flashcard*>::iterator &card_it, le
     }
     else if ((*card_it)->wrong_count == 2)
     {
+        // std::cout << "wrong count = 2" << std::endl;
         (*card_it)->wrong_count = 0;
         switch (current_box)
         {
@@ -106,11 +142,18 @@ void moveCards (int &current_box, std::vector<flashcard*>::iterator &card_it, le
                 card_it = leitner_box->every_three_day_box.erase(card_it);
                 break; 
             case EVERY_DAY_BOX:
+                card_it++;
                 break;
             default:
                 break; 
         }
     }
+    else
+    {
+        // std::cout << "non of above increment the iterator" << std::endl;
+        card_it++;
+    }
+    determineIterator(current_box, card_it, leitner_box);
 }
 
 void reviewCards (int max_card_num, leitner* leitner_box)
@@ -122,6 +165,11 @@ void reviewCards (int max_card_num, leitner* leitner_box)
     while (count < max_card_num)
     {
         determineIterator(current_box, card_it, leitner_box);
+        if (card_it == leitner_box->every_day_box.end())
+        {
+            std::cout << "no more cards to review" << std::endl;
+            abort();
+        }
         if ((*card_it)->last_day_reviewed != leitner_box->today)
         {
             std::cout << output::REVIEW_TODAY_FIRST_LINE;
@@ -146,9 +194,8 @@ void reviewCards (int max_card_num, leitner* leitner_box)
                 leitner_box->every_day_activity[leitner_box->today].wrong_num += 1;
             }
             moveCards (current_box, card_it, leitner_box);
+            count++;
         }
-        count++;
-        card_it++;
     }
 }
 
@@ -156,15 +203,15 @@ void endofDayMoveCards(leitner* leitner_box)
 {
     for (auto i : leitner_box->boxes_to_review_today)
     {
-        if (i.second.reviewed_today == false && i.second.must_review == true)
+        if (i.second.must_review == true)
         {
-            std::vector<flashcard*>::iterator box_it = leitner_box->boxes_map[i.first].begin();
-            while (box_it != leitner_box->boxes_map[i.first].end())
+            std::vector<flashcard*>::iterator box_it = leitner_box->boxes_map[i.first]->begin();
+            while (box_it != leitner_box->boxes_map[i.first]->end() && i.first != EVERY_DAY_BOX)
             {
                 if ((*box_it)->last_day_reviewed != leitner_box->today)
                 {
-                    leitner_box->boxes_map[i.first+1].push_back(*box_it);
-                    box_it = leitner_box->boxes_map[i.first].erase(box_it);
+                    leitner_box->boxes_map[i.first+1]->push_back(*box_it);
+                    box_it = leitner_box->boxes_map[i.first]->erase(box_it);
                 }
                 else
                 {
@@ -176,25 +223,15 @@ void endofDayMoveCards(leitner* leitner_box)
 }
 
 void nesseceryChanges(leitner* leitner_box)
-{
-    if(leitner_box->every_day_activity[leitner_box->today].reviewed == false)
-    {
+{ 
+    if (leitner_box->every_day_activity[leitner_box->today].reviewed == false)
         leitner_box->streak = 0;
-    }  
-    else
-    {
-        leitner_box->streak += 1;
-    }
-
-    if(leitner_box->every_day_activity[leitner_box->today].participated == true)
-    {
-        leitner_box->total_day_participated += 1;
-    }  
 
     leitner_box->today += 1;
     leitner_box->every_day_activity[leitner_box->today].correct_num = 0;
     leitner_box->every_day_activity[leitner_box->today].wrong_num = 0;
     leitner_box->every_day_activity[leitner_box->today].reviewed = false;
+    leitner_box->every_day_activity[leitner_box->today].participated = 0;
 
     for (int i=1; i<=EVERY_DAY_BOX; i++)
     {
@@ -248,7 +285,7 @@ std::string_view processInput::identifyCommand (std::vector<std::string> command
     {
         return it->second(command, leitner_box);
     }
-    return "command not found";
+    return "";
 }
 
 std::string_view processInput::streakFunc (std::vector<std::string> command, leitner* leitner_box)
@@ -258,7 +295,6 @@ std::string_view processInput::streakFunc (std::vector<std::string> command, lei
     return_value += std::to_string(leitner_box->streak);
     return_value += output::END_OF_LINE;
     return_value += output::STREAK_SECOND_LINE;
-    leitner_box->every_day_activity[leitner_box->today].participated = true;
     return std::string_view{return_value};
 }
 
@@ -275,7 +311,6 @@ std::string_view processInput::addFunc (std::vector<std::string> command, leitne
         fc->wrong_count = 0;
         leitner_box->every_day_box.push_back(fc);
     }
-    leitner_box->every_day_activity[leitner_box->today].participated = true;
     return output::ADD_FLASHCARD;
 }
 
@@ -283,9 +318,12 @@ std::string_view processInput::reviewFunc (std::vector<std::string> command, lei
 {
     int card_numbers = std::stoi(command[1]);
     reviewCards(card_numbers, leitner_box);
-    leitner_box->every_day_activity[leitner_box->today].reviewed = true;
-    leitner_box->every_day_activity[leitner_box->today].participated = true;
-
+    if (leitner_box->every_day_activity[leitner_box->today].reviewed == false)
+    {
+        leitner_box->streak += 1;
+        leitner_box->total_day_participated += 1;
+        leitner_box->every_day_activity[leitner_box->today].reviewed = true;
+    }
     return output::REVIEW_TODAY_LAST_MESSAGE;
 }
 
@@ -297,14 +335,13 @@ std::string_view processInput::reportFunc (std::vector<std::string> command, lei
     return_value += output::GET_REPORT_FIRST_LINE;
     return_value += ([start_day, end_day](){if(start_day==end_day)return std::to_string(start_day)+"\n";return std::to_string(start_day)+" to "+std::to_string(end_day)+"\n";})();
     return_value += output::GET_REPORT_SECOND_LINE;
-    int correct_sum = [leitner_box, start_day, end_day](){int correct_sum{0};for(int i=start_day;i<=end_day;i++){correct_sum+=leitner_box->every_day_activity[i].correct_num;}if(start_day==end_day){correct_sum-=leitner_box->every_day_activity[end_day].correct_num;}return correct_sum;}();
+    int correct_sum = [leitner_box, start_day, end_day](){int correct_sum{0};for(int i=start_day;i<=end_day;i++){correct_sum+=leitner_box->every_day_activity[i].correct_num;}return correct_sum;}();
     return_value += std::to_string(correct_sum)+"\n";
     return_value += output::GET_REPORT_THIRD_LINE;
-    int wrong_sum = [leitner_box, start_day, end_day](){int wrong_sum{0};for(int i=start_day;i<=end_day;i++){wrong_sum+=leitner_box->every_day_activity[i].wrong_num;}if(start_day==end_day){wrong_sum-=leitner_box->every_day_activity[end_day].wrong_num;}return wrong_sum;}();
+    int wrong_sum = [leitner_box, start_day, end_day](){int wrong_sum{0};for(int i=start_day;i<=end_day;i++){wrong_sum+=leitner_box->every_day_activity[i].wrong_num;}return wrong_sum;}();
     return_value += std::to_string(wrong_sum)+"\n";
     return_value += output::GET_REPORT_FORTH_LINE;
     return_value += std::to_string(correct_sum+wrong_sum)+"\n";
-    leitner_box->every_day_activity[leitner_box->today].participated = true;
     return std::string_view{return_value};
 }
 
@@ -321,7 +358,6 @@ std::string_view processInput::prgReportFunc (std::vector<std::string> command, 
     return_value += [leitner_box](){return std::to_string(leitner_box->mastered_cards_num)+"\n";}();
     return_value += output::GET_PRG_RPT_FIFTH_LINE;
     return_value += output::GET_PRG_RPT_SIXTH_LINE;
-    leitner_box->every_day_activity[leitner_box->today].participated = true;
     return std::string_view{return_value};
 }
 
